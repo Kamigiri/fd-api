@@ -19,8 +19,9 @@ class LoadDatabase {
     CommandLineRunner initDatabase(IssueRepository repository) {
 
         return args -> {
-            log.info("Preloading " + repository.save(new Issue("Test","Haustier", BigDecimal.valueOf(9.99), "Amazon",new Date())));
-            log.info("Preloading " + repository.save(new Issue("Test2","Haustier", BigDecimal.valueOf(19.99), "Amazon",new Date())));
+            repository.save(new Issue("Test","Haustier", BigDecimal.valueOf(9.99), "Amazon",new Date()));
+            repository.save(new Issue("Test2","Haustier", BigDecimal.valueOf(19.99), "Amazon",new Date()));
+            repository.findAll().forEach(issue -> log.info("Preloaded " + issue));
         };
     }
 }
