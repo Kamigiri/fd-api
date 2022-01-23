@@ -1,6 +1,7 @@
 package com.keraisoft.fd;
 
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -9,6 +10,9 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.hateoas.CollectionModel;
+import org.springframework.hateoas.EntityModel;
+import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
 @RestController
 public class IssueController {
@@ -21,14 +25,25 @@ public class IssueController {
     // Aggregate root
     // tag::get-aggregate-root[]
     @GetMapping("/issues")
-    List<Issue> all() {
-        return  repository.findAll();
+    CollectionModel<EntityModel<Issue>> all() {
+        List<EntityModel<Issue>> issues = repository.findAll().stream().map(issue -> EntityModel.of(issue,
+                linkTo(methodOn(IssueController.class).one(issue.getId())).withRel("issues"))).collect(Collectors.toList());
+        return CollectionModel.of(issues, linkTo(methodOn(IssueController.class).all()).withSelfRel());
     }
     // end::get-aggregate-root[]
 
     @PostMapping("/issue")
     Issue newIssue(@RequestBody Issue newIssue) {
         return repository.save(newIssue);
+    }
+
+    @GetMapping("issue/{id}")
+    EntityModel<Issue> one(@PathVariable Long id) {
+        Issue issue = repository.findById(id).orElseThrow(() -> new IssueNotFoundException(id));
+
+        return EntityModel.of(issue, //
+                linkTo(methodOn(IssueController.class).one(id)).withSelfRel(),
+                linkTo(methodOn(IssueController.class).all()).withRel("issues"));
     }
 
     @PutMapping("/issue/{id}")
