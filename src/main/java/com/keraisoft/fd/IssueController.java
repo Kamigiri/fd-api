@@ -3,6 +3,8 @@ package com.keraisoft.fd;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.hateoas.IanaLinkRelations;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -17,38 +19,41 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 @RestController
 public class IssueController {
     private final IssueRepository repository;
+    private final IssueModelAssembler assembler;
 
-    IssueController(IssueRepository repository) {
+    IssueController(IssueRepository repository, IssueModelAssembler assembler) {
         this.repository = repository;
+        this.assembler = assembler;
     }
 
     // Aggregate root
     // tag::get-aggregate-root[]
     @GetMapping("/issues")
     CollectionModel<EntityModel<Issue>> all() {
-        List<EntityModel<Issue>> issues = repository.findAll().stream().map(issue -> EntityModel.of(issue,
-                linkTo(methodOn(IssueController.class).one(issue.getId())).withRel("issues"))).collect(Collectors.toList());
-        return CollectionModel.of(issues, linkTo(methodOn(IssueController.class).all()).withSelfRel());
+        List<EntityModel<Issue>> issues = repository.findAll().stream().map(assembler::toModel).collect(Collectors.toList());
+
+        return  CollectionModel.of(issues, linkTo(methodOn(IssueController.class).all()).withSelfRel());
     }
     // end::get-aggregate-root[]
 
     @PostMapping("/issue")
-    Issue newIssue(@RequestBody Issue newIssue) {
-        return repository.save(newIssue);
+    ResponseEntity<?>newIssue(@RequestBody Issue newIssue) {
+        EntityModel<Issue> issueModel = assembler.toModel(repository.save(newIssue));
+
+        return  ResponseEntity.created(issueModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(issueModel);
     }
 
     @GetMapping("issue/{id}")
     EntityModel<Issue> one(@PathVariable Long id) {
         Issue issue = repository.findById(id).orElseThrow(() -> new IssueNotFoundException(id));
 
-        return EntityModel.of(issue, //
-                linkTo(methodOn(IssueController.class).one(id)).withSelfRel(),
-                linkTo(methodOn(IssueController.class).all()).withRel("issues"));
+        return assembler.toModel(issue);
     }
 
     @PutMapping("/issue/{id}")
-    Issue replaceIssue(@RequestBody Issue newIssue, @PathVariable Long id) {
-        return repository.findById(id).map( issue -> {
+    ResponseEntity<?> replaceIssue(@RequestBody Issue newIssue, @PathVariable Long id) {
+
+        Issue updatedIssue = repository.findById(id).map( issue -> {
             issue.setName(newIssue.getName());
             issue.setType(newIssue.getType());
             issue.setPrice(newIssue.getPrice());
@@ -59,11 +64,17 @@ public class IssueController {
             newIssue.setId(id);
             return  repository.save(newIssue);
         });
+
+        EntityModel<Issue> issueModel = assembler.toModel(updatedIssue);
+        return ResponseEntity.created(issueModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(issueModel);
     }
 
     @DeleteMapping("/issue/{id}")
-    void deleteIssue(@PathVariable Long id) {
+    ResponseEntity<?> deleteIssue(@PathVariable Long id) {
+
         repository.deleteById(id);
+
+        return ResponseEntity.noContent().build();
     }
 
 }
