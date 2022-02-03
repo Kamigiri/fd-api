@@ -28,7 +28,7 @@ public class IssueController {
 
     // Aggregate root
     // tag::get-aggregate-root[]
-    @GetMapping("/issues")
+    @GetMapping("/api/issues")
     CollectionModel<EntityModel<Issue>> all() {
         List<EntityModel<Issue>> issues = repository.findAll().stream().map(assembler::toModel).collect(Collectors.toList());
 
@@ -36,21 +36,21 @@ public class IssueController {
     }
     // end::get-aggregate-root[]
 
-    @PostMapping("/issue")
+    @PostMapping("/api/issue")
     ResponseEntity<?>newIssue(@RequestBody Issue newIssue) {
         EntityModel<Issue> issueModel = assembler.toModel(repository.save(newIssue));
 
         return  ResponseEntity.created(issueModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(issueModel);
     }
 
-    @GetMapping("issue/{id}")
+    @GetMapping("/api/issue/{id}")
     EntityModel<Issue> one(@PathVariable Long id) {
         Issue issue = repository.findById(id).orElseThrow(() -> new IssueNotFoundException(id));
 
         return assembler.toModel(issue);
     }
 
-    @PutMapping("/issue/{id}")
+    @PutMapping("/api/issue/{id}")
     ResponseEntity<?> replaceIssue(@RequestBody Issue newIssue, @PathVariable Long id) {
 
         Issue updatedIssue = repository.findById(id).map( issue -> {
@@ -69,7 +69,7 @@ public class IssueController {
         return ResponseEntity.created(issueModel.getRequiredLink(IanaLinkRelations.SELF).toUri()).body(issueModel);
     }
 
-    @DeleteMapping("/issue/{id}")
+    @DeleteMapping("/api/issue/{id}")
     ResponseEntity<?> deleteIssue(@PathVariable Long id) {
 
         repository.deleteById(id);
