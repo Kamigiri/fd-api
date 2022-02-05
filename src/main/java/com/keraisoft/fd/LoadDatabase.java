@@ -27,15 +27,15 @@ class LoadDatabase {
         List<List<String>> results = reader.getRecords();
         SimpleDateFormat formatter = new SimpleDateFormat("MMMM dd yyyy", Locale.US);
 
-        return args -> {
+        /*return args -> {
             for (int i= 0; i < results.size(); i++) {
                 if( i == 0) {
                     continue;
                 }
-                repository.save(new Issue(results.get(i).get(0),results.get(i).get(1), BigDecimal.valueOf(Double.parseDouble(results.get(i).get(2))), results.get(i).get(3), formatter.parse(results.get(i).get(4) + results.get(i).get(5))));
+                //repository.save(new Issue(results.get(i).get(0),results.get(i).get(1), BigDecimal.valueOf(Double.parseDouble(results.get(i).get(2))), results.get(i).get(3), formatter.parse(results.get(i).get(4) + results.get(i).get(5))));
             }
             repository.findAll().forEach(issue -> log.info("Preloaded " + issue));
-        };
-    }
+        };*/
 
-}
+        return null;
+    }}

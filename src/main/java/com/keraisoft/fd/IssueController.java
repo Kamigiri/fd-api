@@ -5,6 +5,7 @@ import java.util.stream.Collectors;
 
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
+import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -24,6 +25,13 @@ public class IssueController {
     IssueController(IssueRepository repository, IssueModelAssembler assembler) {
         this.repository = repository;
         this.assembler = assembler;
+    }
+
+    @GetMapping("/issues")
+    public String listAll (Model model) {
+        List<Issue> listIssues = repository.findAll();
+        model.addAttribute("listIssues", listIssues);
+        return "issues";
     }
 
     // Aggregate root
