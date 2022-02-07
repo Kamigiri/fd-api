@@ -3,6 +3,7 @@ package com.keraisoft.fd;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.data.jpa.repository.Query;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;
@@ -27,6 +28,7 @@ public class IssueController {
         this.assembler = assembler;
     }
 
+
     @GetMapping("/issues")
     public String listAll (Model model) {
         List<Issue> listIssues = repository.findAll();
@@ -43,6 +45,18 @@ public class IssueController {
         return  CollectionModel.of(issues, linkTo(methodOn(IssueController.class).all()).withSelfRel());
     }
     // end::get-aggregate-root[]
+
+    @GetMapping("/api/issue/types")
+    List<String> allTypes() {
+
+        return repository.types();
+    }
+
+    @GetMapping("/api/issue/origins")
+    List<String> allOrigins() {
+
+        return repository.origins();
+    }
 
     @PostMapping("/api/issue")
     ResponseEntity<?>newIssue(@RequestBody Issue newIssue) {
