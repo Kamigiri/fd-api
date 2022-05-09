@@ -1,4 +1,4 @@
-package com.keraisoft.fd;
+package com.keraisoft.fd.Issue;
 
 public class IssueNotFoundException extends  RuntimeException{
     IssueNotFoundException(Long id) {

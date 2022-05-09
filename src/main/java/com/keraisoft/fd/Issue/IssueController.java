@@ -1,9 +1,8 @@
-package com.keraisoft.fd;
+package com.keraisoft.fd.Issue;
 
 import java.util.List;
 import java.util.stream.Collectors;
 
-import org.springframework.data.jpa.repository.Query;
 import org.springframework.hateoas.IanaLinkRelations;
 import org.springframework.http.ResponseEntity;
 import org.springframework.ui.Model;

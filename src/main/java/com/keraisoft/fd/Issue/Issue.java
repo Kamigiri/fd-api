@@ -1,4 +1,4 @@
-package com.keraisoft.fd;
+package com.keraisoft.fd.Issue;
 
 import java.math.BigDecimal;
 import java.util.Date;
@@ -19,7 +19,6 @@ public class Issue {
     private String origin;
     private Date recordedDate;
 
-    Issue() {}
 
     Issue(String name, String type, BigDecimal price, String origin, Date recordedDate) {
         this.name = name;
@@ -27,6 +26,10 @@ public class Issue {
         this.price = price;
         this.origin = origin;
         this.recordedDate = recordedDate;
+    }
+
+    public Issue() {
+
     }
 
     public String getName() {

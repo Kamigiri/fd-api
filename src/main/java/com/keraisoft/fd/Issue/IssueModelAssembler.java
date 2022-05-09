@@ -1,4 +1,4 @@
-package com.keraisoft.fd;
+package com.keraisoft.fd.Issue;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.*;
 
